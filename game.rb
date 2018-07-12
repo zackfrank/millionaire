@@ -21,11 +21,18 @@ class Game
       system "clear"
       puts "Welcome to Who Wants to Be A Millionare!\n\n"
       retrieve_question
+      get_answers
+      list_answers
       player_options
       if game_is_over
         start_over?
       end
     end
+  end
+
+  def get_answers
+    @answers = @questions.get_choices
+    @correct_answer = @questions.get_answer
   end
 
   def player_options
@@ -52,8 +59,6 @@ class Game
   def retrieve_question
     puts "Question #{@question_number + 1}:"
     puts @questions.get_question
-    @answers = @questions.get_choices
-    list_answers
   end
 
   def list_answers
@@ -69,7 +74,6 @@ class Game
     print "Your Answer: "
     @user_answer = gets.chomp.to_i - 1
     @question_number += 1
-    @correct_answer = @questions.get_answer
     if @user_answer == @correct_answer
       @purse.increment
       puts "Correct! You have now earned #{@purse.get_value}!"
@@ -119,10 +123,14 @@ class Game
       number = rand(0..3)
       unless number == @correct_answer
         @answers.delete_at(number)
+        if number < @correct_answer
+          @correct_answer -= 1
+        end
       end
     end
     system "clear"
     retrieve_question
+    list_answers
     player_options
   end
 
