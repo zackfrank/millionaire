@@ -1,13 +1,13 @@
 class Purse
   def initialize
     @values = {
-      0 => "$100",
-      1 => "$200",
-      2 => "$300",
-      3 => "$500",
-      4 => "$1,000",
-      5 => "$2,000",
-      6 => "$4,000",
+      1 => "$100",
+      2 => "$200",
+      3 => "$300",
+      4 => "$500",
+      5 => "$1,000",
+      6 => "$2,000",
+      7 => "$4,000",
       8 => "$8,000",
       9 => "$16,000",
       10 => "$32,000",
@@ -17,7 +17,7 @@ class Purse
       14 => "$500,000",
       15 => "$1,000,000"
     }
-    @round = -1
+    @round = 0
   end
 
   def get_value
@@ -27,4 +27,16 @@ class Purse
   def increment
     @round += 1
   end
+
+  def get_tier_value
+    if @round >= 10
+      @tier_value = "$32,000"
+    elsif @round >= 5
+      @tier_value = "$1,000"
+    else 
+      @tier_value = "$0"
+    end
+    return @tier_value
+  end
+
 end
