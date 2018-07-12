@@ -36,13 +36,22 @@ class Game
   end
 
   def player_options
-    puts "Choose an option:"
-    puts "[1] Answer Question"
-    if @purse.get_value
-      puts "[2] Walk Away With #{@purse.get_value}"
+    options = [
+      "Answer Question",
+      "Walk Away With #{@purse.get_value}",
+      "Use a Lifeline"
+    ]
+    unless @purse.get_value
+      options.delete("Walk Away With #{@purse.get_value}")
     end
-    unless @available_lifelines == []
-      puts "[3] Use a Lifeline"
+    if @available_lifelines == []
+      options.delete("Use a Lifeline")
+    end
+    puts "Choose an option:"
+    number = 1
+    options.each do |option|
+      puts "[#{number}] #{options[number-1]}"
+      number += 1
     end
     choice = gets.chomp.to_i
     if choice == 1
