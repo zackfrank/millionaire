@@ -117,8 +117,6 @@ class Game
   end
 
   def fifty_fifty
-    # @answers = @questions.get_choices
-    # correct_answer = @questions.get_answer
     until @answers.length == 2
       number = rand(0..3)
       unless number == @correct_answer
