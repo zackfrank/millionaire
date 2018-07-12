@@ -7,7 +7,7 @@ class Game
 
   def initialize
     @game_number = 0
-    @question_number = 0
+    @question_number = 1
     @answer_number = 0
     @end_game = false
     @purse = Purse.new
@@ -17,10 +17,14 @@ class Game
   end
 
   def start
-    until game_is_over
       system "clear"
       puts "Welcome to Who Wants to Be A Millionare!\n\n"
+      puts "Hit [ENTER] To Play!"
+      gets.chomp
+    until game_is_over
+      system "clear"
       retrieve_question
+      display_question
       get_answers
       list_answers
       player_options
@@ -36,6 +40,7 @@ class Game
   end
 
   def player_options
+    choice = nil
     options = [
       "Answer Question",
       "Walk Away With #{@purse.get_value}",
@@ -53,21 +58,37 @@ class Game
       puts "[#{number}] #{options[number-1]}"
       number += 1
     end
-    choice = gets.chomp.to_i
-    if choice == 1
-      evaluate_answer
-    elsif choice == 2
-      puts "Thanks for playing! You walk away with #{@purse.get_value}!"
-      @end_game = true
-      game_is_over
-    elsif choice == 3
-      choose_lifeline
+    
+    until choice
+      choice = gets.chomp.to_i
+      until choice > 0
+        # if user just hits Enter, prompt for number over 0
+        puts "#{choice} is not a valid option. Please choose an option:"
+        choice = nil
+        choice = gets.chomp.to_i
+      end
+      if options[choice-1] == "Answer Question"
+        evaluate_answer
+      elsif options[choice-1] == "Walk Away With #{@purse.get_value}"
+        puts "Thanks for playing! You walk away with #{@purse.get_value}!"
+        @end_game = true
+        game_is_over
+      elsif options[choice-1] == "Use a Lifeline"
+        choose_lifeline
+      else
+        puts "#{choice} is not a valid option. Please choose an option:"
+        choice = nil
+      end
     end
   end
 
   def retrieve_question
-    puts "Question #{@question_number + 1}:"
-    puts @questions.get_question
+    @current_question = @questions.get_question
+  end
+
+  def display_question
+    puts "Question #{@question_number}:"
+    puts @current_question
   end
 
   def list_answers
@@ -90,7 +111,7 @@ class Game
       puts "Sorry, wrong answer, you walk away with #{@purse.get_tier_value}."
       @end_game = true
     end
-    puts "[ANY KEY] to Continue"
+    puts "[ENTER] to Continue"
     gets.chomp
   end
 
@@ -104,16 +125,22 @@ class Game
     end
 
     print "Choice: "
-    choice = gets.chomp.to_i
-    if choice == 1
-      @lifeline = @available_lifelines[0]
-      @available_lifelines.delete_at(0)
-    elsif choice == 2
-      @lifeline = @available_lifelines[1]
-      @available_lifelines.delete_at(1)
-    elsif choice == 3
-      @lifeline = @available_lifelines[2]
-      @available_lifelines.delete_at(2)
+    choice = nil
+    until choice
+      choice = gets.chomp.to_i
+      if choice == 1
+        @lifeline = @available_lifelines[0]
+        @available_lifelines.delete_at(0)
+      elsif choice == 2
+        @lifeline = @available_lifelines[1]
+        @available_lifelines.delete_at(1)
+      elsif choice == 3
+        @lifeline = @available_lifelines[2]
+        @available_lifelines.delete_at(2)
+      else
+        puts "#{choice} is not a valid option. Please choose an option:"
+        choice = nil
+      end
     end
 
     if @lifeline == "50/50"
@@ -131,20 +158,33 @@ class Game
       unless number == @correct_answer
         @answers.delete_at(number)
         if number < @correct_answer
+          # if deleting an answer option that came before the correct answer, the correct answer moves up and index changes
           @correct_answer -= 1
         end
       end
     end
     system "clear"
-    retrieve_question
+    display_question
     list_answers
     player_options
   end
 
   def ask_audience
+    system "clear"
+    display_question
+    list_answers
+    puts "The audience says, You're on your own!"
+    puts
+    player_options
   end
 
   def phone_friend
+    system "clear"
+    display_question
+    list_answers
+    puts "Your friend says, You're on your own!"
+    puts
+    player_options
   end
 
   def game_is_over
